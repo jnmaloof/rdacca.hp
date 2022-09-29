@@ -44,6 +44,7 @@ permu.hp=function(dv,
 {
   require(dplyr)
   require(magrittr)
+  require(parallel)
   cat("\nPlease wait: running", permutations-1, "permutations \n")
   obs <- rdacca.hp(dv,iv,method=method,type=type,scale=scale,add = add, sqrt.dist = sqrt.dist,n.perm=n.perm)
   r2q <- obs$Hier.part[,3]
@@ -68,7 +69,7 @@ permu.hp=function(dv,
                        tmp=rdacca.hp(dv,newiv,method=method,type=type,scale=scale,add = add, sqrt.dist = sqrt.dist,n.perm=n.perm)
                        return(tmp$Hier.part[,3])
                      })
-    r2q=bind_cols(r2q,simu) %>%
+    r2q=suppressMessages(bind_cols(r2q,simu)) %>%
       as.matrix.data.frame() %>%
       set_rownames(perm.rownames) %>%
       set_colnames(c("r2q", rep("", permutations))) #to get format to match original
@@ -96,7 +97,7 @@ permu.hp=function(dv,
       tmp=rdacca.hp(dv,newiv,method=method,type=type,scale=scale,add = add, sqrt.dist = sqrt.dist,n.perm=n.perm)
       return(tmp$Hier.part[,3])
       })
-    r2q=bind_cols(r2q,simu) %>%
+    r2q=suppressMessages(bind_cols(r2q,simu)) %>%
       as.matrix.data.frame() %>%
       set_rownames(perm.rownames) %>%
       set_colnames(c("r2q", rep("", permutations))) #to get format to match original
