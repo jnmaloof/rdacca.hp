@@ -82,10 +82,12 @@ permu.hp=function(dv,
     simu <- mclapply(1:permutations-1,
                      mc.cores = n.cores,
                      FUN=function(x)
-                     {
-                       if (verbose==TRUE & x %% 10 == 0) cat("permutation ",x,"\n")      perms <- sample(1:n,n)
-      newiv <- list()
-      for(j in 1:nvar)
+      {
+                       if (verbose==TRUE & x %% 10 == 0) {
+                         cat("permutation ",x,"\n")}
+                       perms <- sample(1:n,n)
+                       newiv <- list()
+                       for(j in 1:nvar)
       {
         newiv[[j]] <- data.frame(iv[[j]][perms, ])
         row.names(newiv[[j]]) <- 1:n
