@@ -10,7 +10,7 @@
 #' @param  n.perm An integer; Number of permutations for computing the adjusted R-square for CCA. The argument has an effect only when method="CCA".
 #' @param  permutations An integer; Number of permutations for computing p value of individual contribution for the randomized dataset.
 #' @param  n.cores An integer; Number of cores to use for permutations
-#' @param  verbose Logical; Should permutation counts be output
+#' @param  log Logical; Should every tenth permutation count be written to a log file.
 
 
 #' @details This function is a permutation test of hierarchical partitioning for canonical analysis. It returns a matrix of I values (the individual contribution towards total explained variation) for all values from permutations randomizations. For each permutation, the values in each variable (i.e each column of iv) are randomized independently, and rdacca.hp is run on the randomized iv. As well as the randomized I matrix, the function returns a summary table listing the observed I values, the p value of I for the randomized dataset.
@@ -40,15 +40,18 @@ permu.hp=function(dv,
                       n.perm=1000,
                       permutations=1000,
                       n.cores=1,
-                      verbose=TRUE)
+                      log=TRUE)
 {
   require(dplyr)
   require(magrittr)
   require(parallel)
+  require(readr)
   cat("\nPlease wait: running", permutations-1, "permutations \n")
   obs <- rdacca.hp(dv,iv,method=method,type=type,scale=scale,add = add, sqrt.dist = sqrt.dist,n.perm=n.perm)
   r2q <- obs$Hier.part[,3]
   perm.rownames <- names(r2q)
+
+  if(file.exists("permutationcount.txt")) file.remove("permutationcount.txt")
 
   if(is.data.frame(iv))
   {
@@ -58,7 +61,9 @@ permu.hp=function(dv,
                      mc.cores = n.cores,
                      FUN=function(x)
                      {
-                       if (verbose==TRUE & x %% 10 == 0) cat("permutation ",x,"\n")
+                       if (log==TRUE & x %% 10 == 0) {
+                         write(paste("permutation:",x), "permutationcount.txt", append=TRUE)
+                       }
                        newiv<-iv
                        for(j in 1:nvar) {
                          perms <- sample(1:n,n)
@@ -84,8 +89,9 @@ permu.hp=function(dv,
                      mc.cores = n.cores,
                      FUN=function(x)
       {
-                       if (verbose==TRUE & x %% 10 == 0) {
-                         cat("permutation ",x,"\n")}
+                       if (log==TRUE & x %% 10 == 0) {
+                         write(paste("permutation:",x), "permutationcount.txt", append=TRUE)
+                       }
                        perms <- sample(1:n,n)
                        newiv <- list()
                        for(j in 1:nvar)
