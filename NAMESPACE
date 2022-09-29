@@ -1,6 +1,7 @@
 ## Export regular function names (no dots)
 export(rdacca.hp)
 export(permu.hp)
+export(permu.hp.par)
 S3method(plot, rdaccahp)
 import(stats)
 import(vegan)
